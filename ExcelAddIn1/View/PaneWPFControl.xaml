@@ -1,0 +1,191 @@
+﻿<UserControl x:Class="ExcelAddIn1.View.PaneWPFControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ExcelAddIn1.View"
+             UseLayoutRounding="True">
+    
+    <UserControl.Resources>
+        <Style x:Key="CheckBoxStyle" TargetType="{x:Type CheckBox}">
+            <Setter Property="Visibility" Value="Visible"/>
+            
+            <!--<Setter Property="SnapsToDevicePixels" Value="False" />
+            <Setter Property="OverridesDefaultStyle" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="BorderBrush" Value="LightGray" />-->
+            <!--<Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Border x:Name="Border"
+                                       Width="15"
+                                       Height="15"
+                                       Background="{Binding RelativeSource=Self, Path=Visibility}"
+                                       BorderBrush="{TemplateBinding BorderBrush}"
+                                       BorderThickness="1"
+                                       ClipToBounds="True">
+                                    --><!--<Border.Effect>
+                                        <DropShadowEffect BlurRadius="5" ShadowDepth="2" />
+                                    </Border.Effect>--><!--
+                                    <Path x:Name="CheckMark"
+                                       Width="8"
+                                       Height="8"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Data="M 0 0 L 8 8 M 0 8 L 8 0"
+                                       Stretch="Fill"
+                                       Stroke="LightGray"
+                                       StrokeEndLineCap="Round"
+                                       StrokeStartLineCap="Round"
+                                       StrokeThickness="2" />
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="4,0,0,0"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="BorderBrush" Value="Gray" />
+                                <Setter TargetName="CheckMark" Property="Stroke" Value="Gray" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>-->
+            
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                     AncestorType={x:Type ListBoxItem}}, Path=IsMouseOver}" Value="False"/>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                     AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" Value="False"/>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsChecked}" Value="False"/>
+                    </MultiDataTrigger.Conditions>
+
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+
+        </Style>
+        <local:BoolToBoolConverter x:Key="TrueFalseConverter"/>
+        <local:WidthConverter x:Key="WidthConverter"/>
+    </UserControl.Resources>
+
+    <StackPanel >
+        <StackPanel>
+            <Button Command="{Binding AddSheetCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image  Margin="0 0 5 0" Source="/ExcelAddIn1;component/Resources/add.png"/>
+                    <TextBlock>Новый лист</TextBlock>
+                </StackPanel>
+            </Button>
+            
+            <Label Content="Выделенные листы:" Margin="0 5 0 0"/>
+            
+            <Button Command="{Binding HideSheetCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/ExcelAddIn1;component/Resources/shield.png" Margin="0 0 5 0"/>
+                    <TextBlock Text="{Binding HideButtonLabel}"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding VeryHideSheetCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/ExcelAddIn1;component/Resources/shield.png" Margin="0 0 0 0"/>
+                    <Image Source="/ExcelAddIn1;component/Resources/shield.png" Margin="0 0 5 0"/>
+                    <TextBlock Text="{Binding VeryHideButtonLabel}"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding ShowSheetCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/ExcelAddIn1;component/Resources/table_edit.png" Margin="0 0 5 0"/>
+                    <TextBlock Text="{Binding ShowButtonLabel}"/>
+                </StackPanel>
+            </Button>
+            
+            <Button Margin="0 0 0 10" Command="{Binding DeleteSheetCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image  Margin="0 0 5 0" Source="/ExcelAddIn1;component/Resources/delete.png"/>
+                    <TextBlock Text="{Binding DeleteButtonLabel}"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <Border Background="Wheat" Name="b">
+            <DockPanel>
+                <Label Content="Имя" Width="100" HorizontalAlignment="Center" FontWeight="Bold" DockPanel.Dock="Left"/>
+                <Label Content="Скрыт" Width="50" HorizontalAlignment="Center" FontWeight="Bold"/>
+            </DockPanel>
+        </Border>
+
+        <ListBox Name="lb" ItemsSource="{Binding lst}" Margin="0,0,0,7" SelectionMode="Extended"
+                 SelectionChanged="lb_SelectionChanged" BorderThickness="0" >
+
+            <!--<ListBox.Resources>
+                <Style TargetType="CheckBox" >
+                </Style>
+            </ListBox.Resources>-->
+            
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Style.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}"
+                                         Color="{x:Static SystemColors.HighlightColor}"/>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="LightBlue"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="0 0 0 1">
+                        <Border.BorderBrush>
+                            <VisualBrush>
+                                <VisualBrush.Visual>
+                                    <Rectangle Stroke="Black" StrokeDashArray="5, 2" SnapsToDevicePixels="True"
+                                        Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}},
+                                            Path=ActualWidth}"
+                                        Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}},
+                                            Path=ActualHeight}"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Border.BorderBrush>
+
+                        <Grid Width="{Binding ActualWidth, ElementName=b,
+                                    Converter={StaticResource ResourceKey=WidthConverter}, ConverterParameter='10'}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="{Binding SheetName}" Grid.Column="0"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="1">
+                                <CheckBox IsChecked="{Binding IsHidden}"
+                                          IsEnabled="{Binding IsLastVisible,
+                                              Converter={StaticResource ResourceKey=TrueFalseConverter}}"
+                                          VerticalAlignment="Center"
+                                          Style="{StaticResource CheckBoxStyle}" Margin="0,0,5,0"/>
+                                <CheckBox IsChecked="{Binding IsVeryHidden}"
+                                          IsEnabled="{Binding IsLastVisible,
+                                              Converter={StaticResource ResourceKey=TrueFalseConverter}}"
+                                          VerticalAlignment="Center" 
+                                          Style="{StaticResource CheckBoxStyle}" Margin="0,0,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
+</UserControl>
